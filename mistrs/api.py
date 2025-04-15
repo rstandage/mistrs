@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 
 def post(data, url, headers):
-#Sends data to mist
+#POST data to mist. input requires (data, url, headers)
     payload = json.dumps(data)
     send = requests.request("POST", url, data=payload, headers=headers)
     text = json.loads(send.text)
@@ -16,7 +16,7 @@ def post(data, url, headers):
     return response, text
 
 def put(data, url, headers):
-#Sends data to mist
+#PUT data to mist. input requires (data, url, headers)
     payload = json.dumps(data)
     send = requests.request("PUT", url, data=payload, headers=headers)
     text = json.loads(send.text)
@@ -29,6 +29,7 @@ def put(data, url, headers):
     return response, text
 
 def delete(url, headers):
+    # DELETE data from mist. URL requires full endpoint to remove. Input requires (url, headers)
     try:
         response = requests.request("DELETE", url, headers=headers)
         if response.status_code == 200:
@@ -40,6 +41,7 @@ def delete(url, headers):
         return False, print(f"Request failed: {str(e)}")
 
 def get(url, headers):
+    # GET data from mist. input requires (url, headers). return will be an array of the response
     try:
         resp = requests.get(url, headers=headers)
         resp.raise_for_status()  # Check for HTTP errors
@@ -50,6 +52,7 @@ def get(url, headers):
         return None
 
 def get_paginated(initial_url, headers, show_progress=True):
+    # GET data from mist when multiple pages are returned. input requires (initial_url, headers). return will be an array of the responses
     all_results = []
     try:
         # Extract base URL from initial URL

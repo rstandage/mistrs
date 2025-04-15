@@ -2,6 +2,7 @@ import json
 import pandas as pd
 
 def pprint(data):
+    #Prints JSON in an easy to ready format
     print(json.dumps(data, indent=2, sort_keys=True))
 
 def read_xlsx(file):

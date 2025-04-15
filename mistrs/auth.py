@@ -4,7 +4,7 @@ from pathlib import Path
 
 def get_credentials(environment: str = None, interactive: bool = True) -> Dict[str, str]:
     """
-    Get API credentials from the environment file.
+    Get API credentials from the environment file. Files are stored in .mistrs file at user home
 
     Args:
         environment (str, optional): Environment name ('emea01', 'global01', etc.)
@@ -136,6 +136,11 @@ if __name__ == "__main__":
 
 
 def get_headers(token):
+    '''
+        This will build the required headers for API interation.
+        example usage once credentials are obtained:
+            headers = get_headers(credentials["api_token"])
+    '''
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Token {token}'
