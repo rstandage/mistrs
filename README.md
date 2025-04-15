@@ -1,4 +1,6 @@
-# mistrs v0.1.0
+from tests.self_check import credentials
+
+# mistrs v0.1.1
 
 **mistrs** is a Python library designed to simplify interactions with the Mist API. It provides tools for API interaction, authentication, and data handling, making it easier to manage Mist programmatically.
 
@@ -29,7 +31,7 @@ The library supports multiple Mist environments (e.g., `global01`, `emea01`) and
 
 ```python
 
-from mistrs.auth import get_credentials, get_headers
+from mistrs import get_credentials, get_headers
 
 # Interactive mode - will prompt for environment selection and API token
 credentials = get_credentials()
@@ -37,13 +39,20 @@ credentials = get_credentials()
 # Non-interactive mode with specific environment
 credentials = get_credentials(environment="emea01", interactive=False)
 
-#get_headers will create the headers for API calls. You can also insert an org token here
+#get_headers will create the headers for API calls.
 headers = get_headers(credentials["api_token"])
-org_headers = get_headers('ORG_TOKEN_STR')
-
 
 
 ```
+
+To handle org level tokens, you can add the one-time-token arg into get_credentials. This will also provide the option to save the file
+
+```python
+from mistrs import get_credentials
+credentials = get_credentials(one_time_token=True)
+
+```
+
 
 ### Making API requests
 
@@ -51,8 +60,7 @@ The library supports all API functions, get, post, put and delete.
 
 ```python
 
-from mistrs.auth import get_credentials, get_headers
-from mistrs.api import get, post
+from mistrs import get_credentials, get_headers, get, post
 
 # Get credentials
 credentials = get_credentials(environment="global01")
@@ -96,8 +104,7 @@ There is a specific function to support endpoints with large datasets that requi
 
 ```python
 
-from mistrs.auth import get_credentials, get_headers
-from mistrs.api import get_paginated
+from mistrs import get_credentials, get_headers, get_paginated
 
 # Get credentials
 credentials = get_credentials(environment="global01")
@@ -116,7 +123,7 @@ all_aps = get_paginated(url)
 The library had functions for handling data, for example this is how we can create an Excel file for our APs
 
 ```python
-from mistrs.data import create_xlsx
+from mistrs import create_xlsx
 
 #Create file path
 filepath = 'my_aps.xlsx'
