@@ -97,7 +97,7 @@ There is a specific function to support endpoints with large datasets that requi
 ```python
 
 from mistrs.auth import get_credentials, get_headers
-from mistrs.api import get, post
+from mistrs.api import get_paginated
 
 # Get credentials
 credentials = get_credentials(environment="global01")
@@ -109,7 +109,7 @@ headers = get_headers(credentials["api_token"])
 url = f"{credentials['api_url']}/orgs/{org_id}/inventory?type=ap&limit=10"
 
 #Get all devices
-all_aps = get_all(url)
+all_aps = get_paginated(url)
 ```
 ### Handling data
 
