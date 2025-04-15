@@ -1,11 +1,15 @@
 from setuptools import setup, find_packages
 
+# Read the README file
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name="mistrs",
     version="0.1.0",
     author="Rory Standage",
     description="A library of basic functions to communicate with Mist API",
-    url="https://github.com/yourusername/my_package",
+    url="https://github.com/rstandage/mistrs",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
