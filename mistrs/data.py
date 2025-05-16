@@ -71,3 +71,36 @@ def print_table(array, headers=None):
         return table
     except Exception as e:
         print(f"Error creating table: {str(e)}")
+
+def clean_mac(mac_address: str):
+    # Remove all dots and colons and convert to lowercase
+    normalized = mac_address.replace('.', '').replace(':', '').lower()
+    return normalized
+
+from datetime import datetime
+
+def edittime(epoch_timestamp):
+    """
+    Convert epoch timestamp to standard datetime format.
+
+    Args:
+        epoch_timestamp (int): Unix epoch timestamp in seconds
+
+    Returns:
+        str: Formatted datetime string in the format 'YYYY-MM-DD HH:MM:SS'
+
+    Example:
+        >>> epoch_to_standard_time(1683936000)
+        '2023-05-13 00:00:00'
+    """
+    try:
+        # Convert epoch to datetime object
+        dt = datetime.fromtimestamp(epoch_timestamp)
+
+        # Format the datetime as string
+        standard_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        return standard_time
+    except (ValueError, TypeError) as e:
+        return f"Error converting timestamp: {str(e)}"
+

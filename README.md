@@ -1,6 +1,6 @@
 from tests.self_check import credentials
 
-# mistrs v0.1.1
+# mistrs v0.1.3
 
 **mistrs** is a Python library designed to simplify interactions with the Mist API. It provides tools for API interaction, authentication, and data handling, making it easier to manage Mist programmatically.
 
@@ -69,7 +69,7 @@ credentials = get_credentials(environment="global01")
 headers = get_headers(credentials["api_token"])
 
 #Create org sites url
-url = f"{credentials['api_url']}/orgs/{org_id}/sites"
+url = f"{credentials['api_url']}orgs/{org_id}/sites"
 
 #Get data from API
 sites = get(url, headers)
@@ -113,7 +113,7 @@ credentials = get_credentials(environment="global01")
 headers = get_headers(credentials["api_token"])
 
 #Create org sites url
-url = f"{credentials['api_url']}/orgs/{org_id}/inventory?type=ap&limit=10"
+url = f"{credentials['api_url']}orgs/{org_id}/inventory?type=ap&limit=10"
 
 #Get all devices
 all_aps = get_paginated(url)

@@ -14,7 +14,7 @@ def post(data, url, headers):
         print("Failed - HTTP Error {}".format(send.status_code))
         response = False
     return response, text
-
+ 
 def put(data, url, headers):
 #PUT data to mist. input requires (data, url, headers)
     payload = json.dumps(data)

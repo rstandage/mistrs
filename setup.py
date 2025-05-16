@@ -6,10 +6,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mistrs",
-    version="0.1.1",
+    version="0.1.3",
     author="Rory Standage",
-    description="A library of basic functions to communicate with Mist API",
+    description="A collection of basic functions to communicate with Mist API",
     url="https://github.com/rstandage/mistrs",
+    license='MIT License',
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
