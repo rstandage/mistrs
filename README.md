@@ -1,4 +1,3 @@
-from tests.self_check import credentials
 
 # mistrs v0.1.3
 
@@ -49,7 +48,7 @@ To handle org level tokens, you can add the one-time-token arg into get_credenti
 
 ```python
 from mistrs import get_credentials
-credentials = get_credentials(one_time_token=True)
+credentials = get_credentials(otp=True)
 
 ```
 
@@ -93,7 +92,7 @@ new_site = {
     "gatewaytemplate_id": None,
     "sitetemplate_id": None
 }
-response, data = post(new_site_data, url, headers)
+response, data = post(new_site, url, headers)
 if response:
     print(f"Created site with ID: {data.get('id')}")
 

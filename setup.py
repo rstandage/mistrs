@@ -7,6 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="mistrs",
     version="0.1.3",
+    released="16/5/2025",
     author="Rory Standage",
     description="A collection of basic functions to communicate with Mist API",
     url="https://github.com/rstandage/mistrs",
