@@ -1,6 +1,9 @@
 import json
 import pandas as pd
 from prettytable import PrettyTable
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
 
 def jprint(data):
     #Prints JSON in an easy to ready format
@@ -90,7 +93,7 @@ def edittime(epoch_timestamp):
         str: Formatted datetime string in the format 'YYYY-MM-DD HH:MM:SS'
 
     Example:
-        >>> epoch_to_standard_time(1683936000)
+        epoch_to_standard_time(1683936000)
         '2023-05-13 00:00:00'
     """
     try:
@@ -104,3 +107,77 @@ def edittime(epoch_timestamp):
     except (ValueError, TypeError) as e:
         return f"Error converting timestamp: {str(e)}"
 
+def analyze_errors(error='Error ', data, site_array, group_by='site', top_n=None, save_path=None):
+    """
+    Analyze AP disconnection data and create a time series visualization.
+
+    Parameters:
+    - error = str of error name
+    - config: API configuration
+    - data: List of events pulled from API
+    - site_array: List of site information for lookups. items are a dict {'id': '12345', 'name':'site1'}
+    - group_by: 'site' or 'ap' to determine grouping method
+    - top_n: Optional integer to limit display to top N sites/APs with most errors
+    - save_path: Optional path to save the figure
+
+    Returns:
+    - DataFrame with processed data
+    """
+    # Convert to DataFrame
+    df = pd.DataFrame(data)
+
+    # Convert timestamps to datetime
+    df['datetime'] = pd.to_datetime(df['timestamp'], unit='s')
+
+    # Add site name if grouping by site
+    if group_by == 'site':
+        # Create a lookup dictionary for faster access
+        site_lookup = {site['id']: site['name'] for site in site_array}
+
+        # Map site_id to site_name
+        df['site_name'] = df['site_id'].map(site_lookup)
+        group_column = 'site_name'
+        title = f'{error} by Site'
+
+    else:  # group by AP
+        group_column = 'ap'
+        title = f'{error} by Access Point'
+
+    # Group by selected column and date
+    grouped = df.groupby([df['datetime'].dt.date, group_column]).size().unstack().fillna(0)
+
+    # If top_n is specified, filter to show only the top N sites/APs with most errors
+    if top_n and top_n < len(grouped.columns):
+        # Calculate total errors for each site/AP
+        totals = grouped.sum().sort_values(ascending=False)
+        top_columns = totals.head(top_n).index
+        grouped = grouped[top_columns]
+        title += f" (Top {top_n})"
+
+    # Plot the data
+    plt.figure(figsize=(12, 8))
+
+    # Use seaborn for better aesthetics
+    sns.set_style("whitegrid")
+
+    # Plot each group as a line
+    for column in grouped.columns:
+        plt.plot(grouped.index, grouped[column], marker='o', linewidth=2, label=column)
+
+    # Add labels and title
+    plt.xlabel('Date')
+    plt.ylabel('Number of Errors')
+    plt.title(title)
+    plt.legend(title=group_by.capitalize(), bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+
+    # Save the figure if a path is provided
+    if save_path:
+        # Ensure the directory exists
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Figure saved to {save_path}")
+
+    plt.show()
+
+    return df
