@@ -107,7 +107,7 @@ def edittime(epoch_timestamp):
     except (ValueError, TypeError) as e:
         return f"Error converting timestamp: {str(e)}"
 
-def analyze_errors(data, site_array, error='Error ', group_by='site', top_n=None, save_path=None):
+def analyze_errors(data, site_array=None, error='Error ', group_by='site', top_n=None, save_path=None):
     """
     Analyze AP disconnection data and create a time series visualization.
 
@@ -129,17 +129,16 @@ def analyze_errors(data, site_array, error='Error ', group_by='site', top_n=None
     # Convert timestamps to datetime
     df['datetime'] = pd.to_datetime(df['timestamp'], unit='s')
 
-    # Add site name if grouping by site
+    # Add site name if grouping by site if site_array is provided
     if group_by == 'site':
-        # Create a lookup dictionary for faster access
-        site_lookup = {site['id']: site['name'] for site in site_array}
-
-        # Map site_id to site_name
-        df['site_name'] = df['site_id'].map(site_lookup)
-        group_column = 'site_name'
+        if site_array:  # Only map if site_array is provided and not empty
+            site_lookup = {site['id']: site['name'] for site in site_array}
+            df['site_name'] = df['site_id'].map(site_lookup)
+            group_column = 'site_name'
+        else:
+            group_column = 'site_id'
         title = f'{error} by Site'
-
-    else:  # group by AP
+    else:
         group_column = 'ap'
         title = f'{error} by Access Point'
 

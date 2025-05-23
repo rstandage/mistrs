@@ -1,5 +1,5 @@
 
-# mistrs v0.1.4
+# mistrs v0.1.5
 
 **mistrs** is a Python library designed to simplify interactions with the Mist API. It provides tools for API interaction, authentication, and data handling, making it easier to manage Mist programmatically.
 
@@ -11,7 +11,7 @@
 - **API Interaction**: Simplified functions for GET, PUT and POST requests to the Mist API.
 - **Pagination Handling**: Automatically handle paginated API responses.
 - **Data Handling**: Read, modify and create XLSX/CSV files for readable data output
-
+- **Error Checking** Create and map graphs to analyse issues
 ---
 
 ## Installation
@@ -132,5 +132,35 @@ create_xlsx(all_aps, filepath)
 #
 
 ```
+
+### Tracking Errors
+
+This function takes error data collected from Mist and creates graphs to easily analyze the data
+```python
+
+from mistrs import get_credentials, get_headers, get_paginated, analyze_errors
+
+# Get credentials
+credentials = get_credentials(environment="global01")
+
+# Set up headers with authentication
+headers = get_headers(credentials["api_token"])
+
+# Get errors
+org_id = 'bbe9c211-b497-4f9c-8e6e-f41d00df1771'
+error = 'AP_DISCONNECTED'
+url = f"{credentials['api_url']}orgs/{org_id}/devices/events/search?type={error}&duration=7d"
+data = get_paginated(url, headers, limit=100, show_progress=True)
+processed_data = analyze_errors(
+    data=data,
+    site_array=Site_Array, #Optional to convert id to name
+    error=error,
+    group_by='site',
+    top_n=10,
+    save_path=f'top_{top_n}_{error}.png'
+)
+```
+
+
 ### Licenses
 This project is licensed under the MIT license
