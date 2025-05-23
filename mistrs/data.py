@@ -107,7 +107,7 @@ def edittime(epoch_timestamp):
     except (ValueError, TypeError) as e:
         return f"Error converting timestamp: {str(e)}"
 
-def analyze_errors(error='Error ', data, site_array, group_by='site', top_n=None, save_path=None):
+def analyze_errors(data, site_array, error='Error ', group_by='site', top_n=None, save_path=None):
     """
     Analyze AP disconnection data and create a time series visualization.
 
