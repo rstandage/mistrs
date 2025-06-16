@@ -1,5 +1,5 @@
 
-# mistrs v0.1.5
+# mistrs v0.1.6
 
 **mistrs** is a Python library designed to simplify interactions with the Mist API. It provides tools for API interaction, authentication, and data handling, making it easier to manage Mist programmatically.
 
@@ -141,13 +141,13 @@ This function takes error data collected from Mist and creates graphs to easily 
 from mistrs import get_credentials, get_headers, get_paginated, analyze_errors
 
 # Get credentials
-credentials = get_credentials(environment="global01")
+credentials = get_credentials(environment="emea02")
 
 # Set up headers with authentication
 headers = get_headers(credentials["api_token"])
 
 # Get errors
-org_id = 'bbe9c211-b497-4f9c-8e6e-f41d00df1771'
+org_id = '3b2fc535-8266-4974-9f68-e55db37cf85f'
 error = 'AP_DISCONNECTED'
 url = f"{credentials['api_url']}orgs/{org_id}/devices/events/search?type={error}&duration=7d"
 data = get_paginated(url, headers, limit=100, show_progress=True)

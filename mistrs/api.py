@@ -1,7 +1,5 @@
-import requests, json, time, urllib.parse
+import requests, json, time, urllib.parse, re
 from tqdm import tqdm
-
-
 
 def post(data, url, headers):
 #POST data to mist. input requires (data, url, headers)
@@ -51,12 +49,6 @@ def get(url, headers):
     except Exception as e:
         print(f"Error in API request: {e}")
         return None
-
-import requests
-import time
-from tqdm import tqdm
-import urllib.parse
-import re
 
 def get_paginated(initial_url, headers, limit=100, show_progress=True, debug=False):
     """
