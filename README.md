@@ -1,5 +1,5 @@
 
-# mistrs v0.1.6
+# mistrs v0.1.7
 
 **mistrs** is a Python library designed to simplify interactions with the Mist API. It provides tools for API interaction, authentication, and data handling, making it easier to manage Mist programmatically.
 
@@ -49,6 +49,8 @@ To handle org level tokens, you can add the one-time-token arg into get_credenti
 ```python
 from mistrs import get_credentials
 credentials = get_credentials(otp=True)
+
+From 0.1.6, Org tokens are default behaivour. User tokens will be deprecated
 
 ```
 

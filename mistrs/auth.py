@@ -93,23 +93,23 @@ def display_user_info(user_data: Dict):
     print("\nUser Information:")
     print(table)
 
-def get_existing_tokens(config_dir: Path, token_type: str = "otp") -> List[Dict]:
+def get_existing_tokens(config_dir: Path, token_type: str = "org_token") -> List[Dict]:
     """
     Get list of existing tokens and their details
     Args:
         config_dir (Path): Directory containing token files
-        token_type (str): Type of token to look for ("otp" or "regular")
+        token_type (str): Type of token to look for ("org_token" or "regular")
     Returns:
         list: List of dictionaries containing token details
     """
     tokens = []
-    pattern = "*_otp.env" if token_type == "otp" else "*.env"
+    pattern = "*_org.env" if token_type == "org_token" else "*.env"
     for file in config_dir.glob(pattern):
-        # Skip regular env files when looking for OTP tokens
-        if token_type == "otp" and not file.name.endswith("_otp.env"):
+        # Skip regular env files when looking for org tokens
+        if token_type == "org_token" and not file.name.endswith("_org.env"):
             continue
-        # Skip OTP env files when looking for regular tokens
-        if token_type == "regular" and file.name.endswith("_otp.env"):
+        # Skip org env files when looking for regular tokens
+        if token_type == "regular" and file.name.endswith("_org.env"):
             continue
 
         try:
@@ -126,14 +126,15 @@ def get_existing_tokens(config_dir: Path, token_type: str = "otp") -> List[Dict]
             continue
     return tokens
 
-def get_credentials(environment: str = None, interactive: bool = True, otp: bool = False) -> Dict[str, str]:
+def get_credentials(environment: str = None, interactive: bool = True, org_token: bool = True, otp: bool = None) -> Dict[str, str]:
     """
     Get API credentials from the environment file. Files are stored in .mistrs file at user home
 
     Args:
         environment (str, optional): Environment name ('emea01', 'global01', etc.)
         interactive (bool): If True, allows user input for missing credentials.
-        otp (bool): If True, handles OTP/one-time token flow
+        org_token (bool): If True, handles org token/one-time token flow (default)
+        otp (bool): Deprecated, use org_token instead. For backward compatibility.
 
     Returns:
         dict: Dictionary containing 'api_url', 'api_token', and additional metadata
@@ -142,116 +143,139 @@ def get_credentials(environment: str = None, interactive: bool = True, otp: bool
     config_dir = Path.home() / ".mistrs"
     config_dir.mkdir(parents=True, exist_ok=True)
 
+    # Determine which token type to use (backward compatibility for otp parameter)
+    use_org_token = org_token if otp is None else otp
+
     # Validate environment if provided
     if environment and environment.lower() not in ENVIRONMENTS:
         raise ValueError(f"Invalid environment. Choose from: {', '.join(ENVIRONMENTS.keys())}")
 
-    # Handle OTP/one-time token flow
-    if otp and interactive:
-        existing_tokens = get_existing_tokens(config_dir, "otp")
+    # Handle org token/one-time token flow
+    if use_org_token:
+        if interactive:
+            existing_tokens = get_existing_tokens(config_dir, "org_token")
 
-        # Display existing OTP tokens
-        if existing_tokens:
-            print("\nExisting OTP tokens:")
-            table = PrettyTable()
-            table.field_names = ["#", "Organization", "Environment", "Created"]
-            for i, token in enumerate(existing_tokens, 1):
-                table.add_row([
-                    i,
-                    token['org_name'],
-                    token['environment'],
-                    token['created']
-                ])
-            print(table)
+            # Display existing org tokens
+            if existing_tokens:
+                print("\nExisting org tokens:")
+                table = PrettyTable()
+                table.field_names = ["#", "Organization", "Environment", "Created"]
+                for i, token in enumerate(existing_tokens, 1):
+                    table.add_row([
+                        i,
+                        token['org_name'],
+                        token['environment'],
+                        token['created']
+                    ])
+                print(table)
 
-        # Display options
-        print("\nOptions:")
-        print("0. Create new OTP token")
-        if existing_tokens:
-            print(f"1-{len(existing_tokens)}: Use existing token")
+            # Display options
+            print("\nOptions:")
+            print("0. Create new org token")
+            if existing_tokens:
+                print(f"1-{len(existing_tokens)}: Use existing token")
 
-        while True:
-            try:
-                selection = int(input("\nSelect option: "))
-                if selection == 0:
-                    # Environment selection if not provided
-                    if not environment:
-                        print("\nAvailable environments:")
-                        for i, (env_key, env_data) in enumerate(ENVIRONMENTS.items(), 1):
-                            print(f"{i}. {env_data['name']}")
-                            print(f"   API: {env_data['api_url']}")
+            while True:
+                try:
+                    selection = int(input("\nSelect option: "))
+                    if selection == 0:
+                        # Environment selection if not provided
+                        if not environment:
+                            print("\nAvailable environments:")
+                            for i, (env_key, env_data) in enumerate(ENVIRONMENTS.items(), 1):
+                                print(f"{i}. {env_data['name']}")
+                                print(f"   API: {env_data['api_url']}")
 
+                            while True:
+                                try:
+                                    env_selection = int(input("\nSelect environment number: "))
+                                    if 1 <= env_selection <= len(ENVIRONMENTS):
+                                        environment = list(ENVIRONMENTS.keys())[env_selection - 1]
+                                        break
+                                    print("Invalid selection. Please try again.")
+                                except ValueError:
+                                    print("Invalid input. Please enter a number.")
+
+                        print(f"\nCreating new org token for {ENVIRONMENTS[environment]['name']}")
+                        print(f"API URL: {ENVIRONMENTS[environment]['api_url']}")
+
+                        # Get token and validate
                         while True:
-                            try:
-                                env_selection = int(input("\nSelect environment number: "))
-                                if 1 <= env_selection <= len(ENVIRONMENTS):
-                                    environment = list(ENVIRONMENTS.keys())[env_selection - 1]
-                                    break
-                                print("Invalid selection. Please try again.")
-                            except ValueError:
-                                print("Invalid input. Please enter a number.")
+                            api_token = input("Enter org token: ").strip()
+                            if api_token:
+                                break
+                            print("Token cannot be empty. Please try again.")
 
-                    print(f"\nCreating new OTP token for {ENVIRONMENTS[environment]['name']}")
-                    print(f"API URL: {ENVIRONMENTS[environment]['api_url']}")
+                        credentials = {
+                            "api_token": api_token,
+                            "api_url": ENVIRONMENTS[environment]['api_url'],
+                            "environment": environment,
+                            "created": datetime.now().isoformat()
+                        }
 
-                    # Get token and validate
-                    while True:
-                        api_token = input("Enter OTP token: ").strip()
-                        if api_token:
-                            break
-                        print("Token cannot be empty. Please try again.")
+                        # Validate and get org info
+                        try:
+                            user_info = validate_credentials(credentials['api_url'], credentials['api_token'])
+                            display_user_info(user_info)
 
-                    credentials = {
-                        "api_token": api_token,
-                        "api_url": ENVIRONMENTS[environment]['api_url'],
-                        "environment": environment,
-                        "created": datetime.now().isoformat()
-                    }
+                            if user_info.get('privileges'):
+                                org_privilege = user_info['privileges'][0]
+                                credentials.update({
+                                    "org_id": org_privilege.get('org_id'),
+                                    "org_name": org_privilege.get('name')
+                                })
 
-                    # Validate and get org info
-                    try:
-                        user_info = validate_credentials(credentials['api_url'], credentials['api_token'])
-                        display_user_info(user_info)
+                            # Ask if user wants to store the token
+                            store = input("\nWould you like to store this token? (yes/no): ").lower().strip()
+                            if store in ['y', 'yes']:
+                                safe_org_name = re.sub(r'[^a-zA-Z0-9]', '_', credentials['org_name'].lower())
+                                env_file = config_dir / f"{safe_org_name}_{environment}_org.env"
+                                env_file.write_text(json.dumps(credentials, indent=4))
+                                print(f"Org token saved at: {env_file}")
 
-                        if user_info.get('privileges'):
-                            org_privilege = user_info['privileges'][0]
-                            credentials.update({
-                                "org_id": org_privilege.get('org_id'),
-                                "org_name": org_privilege.get('name')
-                            })
+                            return credentials
 
-                        # Ask if user wants to store the token
-                        store = input("\nWould you like to store this token? (yes/no): ").lower().strip()
-                        if store in ['y', 'yes']:
-                            safe_org_name = re.sub(r'[^a-zA-Z0-9]', '_', credentials['org_name'].lower())
-                            env_file = config_dir / f"{safe_org_name}_{environment}_otp.env"
-                            env_file.write_text(json.dumps(credentials, indent=4))
-                            print(f"OTP token saved at: {env_file}")
+                        except Exception as e:
+                            raise ValueError(f"Failed to validate org token: {str(e)}")
 
-                        return credentials
+                    elif 1 <= selection <= len(existing_tokens):
+                        # Use existing token
+                        selected_token = existing_tokens[selection - 1]
+                        env_file = config_dir / selected_token["filename"]
+                        credentials = json.loads(env_file.read_text())
 
-                    except Exception as e:
-                        raise ValueError(f"Failed to validate OTP token: {str(e)}")
+                        # Validate existing token
+                        try:
+                            user_info = validate_credentials(credentials['api_url'], credentials['api_token'])
+                            display_user_info(user_info)
+                            return credentials
+                        except ValueError as e:
+                            print(f"Token validation failed: {e}")
+                            print("Please create a new token.")
+                            continue
 
-                elif 1 <= selection <= len(existing_tokens):
-                    # Use existing token
-                    selected_token = existing_tokens[selection - 1]
-                    env_file = config_dir / selected_token["filename"]
-                    credentials = json.loads(env_file.read_text())
+                    print("Invalid selection. Please try again.")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+        else:
+            # Non-interactive org token flow
+            if not environment:
+                raise ValueError("Environment must be specified for non-interactive org token authentication")
+            existing_tokens = get_existing_tokens(config_dir, "org_token")
+            matching_tokens = [t for t in existing_tokens if t['environment'] == environment]
+            if not matching_tokens:
+                raise ValueError(f"No stored org token found for environment {environment}. Please run interactively first.")
+            selected_token = matching_tokens[0]
+            env_file = config_dir / selected_token["filename"]
+            credentials = json.loads(env_file.read_text())
+            try:
+                user_info = validate_credentials(credentials['api_url'], credentials['api_token'])
+                display_user_info(user_info)
+                return credentials
+            except ValueError as e:
+                raise ValueError(f"Stored org token validation failed: {e}")
 
-                    # Validate existing token
-                    try:
-                        user_info = validate_credentials(credentials['api_url'], credentials['api_token'])
-                        display_user_info(user_info)
-                        return credentials
-                    except ValueError as e:
-                        print(f"Token validation failed: {e}")
-                        print("Please create a new token.")
-                        continue
-
-                print("Invalid selection. Please try again.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
+# Example usage
 
     # Handle regular token flow
     if not otp:
@@ -327,11 +351,8 @@ def get_credentials(environment: str = None, interactive: bool = True, otp: bool
 # Example usage
 if __name__ == "__main__":
     try:
-        # For OTP/one-time token
-        credentials = get_credentials(otp=True)
-
-        # For regular token
-        # credentials = get_credentials()
+        # For org token
+        credentials = get_credentials()
 
         print("\nCredentials retrieved successfully!")
         print(f"API URL: {credentials['api_url']}")

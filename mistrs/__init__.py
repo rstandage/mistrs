@@ -1,5 +1,5 @@
 # __init__.py
-__version__ = "0.1.5"
+__version__ = "0.1.7"
 
 from .auth import get_credentials, get_headers
 from .api import get, get_paginated, post, put, delete
