@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mistrs",
-    version="0.1.6",
-    released="16/6/2025",
+    version="0.1.8",
+    released="23/10/2025",
     author="Rory Standage",
     description="A collection of basic functions to communicate with Mist API",
     url="https://github.com/rstandage/mistrs",
@@ -31,7 +31,7 @@ setup(
         "requests>=2.25.0",
         "urllib3>=1.26.0",
         "tqdm>=4.67.1",
-        "matplotlib>=3.10.3",
+        "matplotlib>=3.9.4",
         "seaborn>=0.13.2"
     ]
 )

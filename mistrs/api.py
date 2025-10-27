@@ -1,6 +1,98 @@
 import requests, json, time, urllib.parse, re
 from tqdm import tqdm
 
+def debug_get(url, headers):
+    """Safely execute GET request with error handling"""
+    resp = get(url, headers)
+    if isinstance(resp, str):
+        print(f"API Error: {resp}")
+        sys.exit(1)
+    return resp
+
+def debug_put(data, url, headers):
+    """Safely execute PUT request with detailed error handling"""
+    import requests
+    try:
+        # Use requests directly for better error visibility
+        response = requests.put(url, json=data, headers=headers)
+        
+        print(f"\nDEBUG - HTTP Status Code: {response.status_code}")
+        print(f"DEBUG - Response Headers: {dict(response.headers)}")
+        print(f"DEBUG - Response Text (first 500 chars): {response.text[:500]}")
+        
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except json.JSONDecodeError:
+                # Success but no JSON body (sometimes APIs return empty on success)
+                if not response.text.strip():
+                    return True
+                print(f"Warning: Received non-JSON response: {response.text}")
+                return response.text
+        else:
+            print(f"HTTP Error {response.status_code}: {response.text}")
+            return None
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {str(e)}")
+        return None
+
+def debug_post(data, url, headers):
+    """Safely execute POST request with detailed error handling"""
+    import requests
+    try:
+        # Use requests directly for better error visibility
+        response = requests.post(url, json=data, headers=headers)
+        
+        print(f"\nDEBUG - HTTP Status Code: {response.status_code}")
+        print(f"DEBUG - Response Headers: {dict(response.headers)}")
+        print(f"DEBUG - Response Text (first 500 chars): {response.text[:500]}")
+        
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except json.JSONDecodeError:
+                # Success but no JSON body (sometimes APIs return empty on success)
+                if not response.text.strip():
+                    return True
+                print(f"Warning: Received non-JSON response: {response.text}")
+                return response.text
+        else:
+            print(f"HTTP Error {response.status_code}: {response.text}")
+            return None
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {str(e)}")
+        return None
+
+def debug_delete(url, headers):
+    """Safely execute DELETE request with detailed error handling"""
+    import requests
+    try:
+        # Use requests directly for better error visibility
+        response = requests.delete(url, headers=headers)
+        
+        print(f"\nDEBUG - HTTP Status Code: {response.status_code}")
+        print(f"DEBUG - Response Headers: {dict(response.headers)}")
+        print(f"DEBUG - Response Text (first 500 chars): {response.text[:500]}")
+        
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except json.JSONDecodeError:
+                # Success but no JSON body (sometimes APIs return empty on success)
+                if not response.text.strip():
+                    return True
+                print(f"Warning: Received non-JSON response: {response.text}")
+                return response.text
+        else:
+            print(f"HTTP Error {response.status_code}: {response.text}")
+            return None
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {str(e)}")
+        return None
+
 def post(data, url, headers):
 #POST data to mist. input requires (data, url, headers)
     payload = json.dumps(data)

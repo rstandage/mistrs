@@ -4,6 +4,7 @@ from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+from datetime import datetime
 
 def jprint(data):
     #Prints JSON in an easy to ready format
@@ -80,8 +81,6 @@ def clean_mac(mac_address: str):
     normalized = mac_address.replace('.', '').replace(':', '').lower()
     return normalized
 
-from datetime import datetime
-
 def edittime(epoch_timestamp):
     """
     Convert epoch timestamp to standard datetime format.
@@ -106,6 +105,16 @@ def edittime(epoch_timestamp):
         return standard_time
     except (ValueError, TypeError) as e:
         return f"Error converting timestamp: {str(e)}"
+
+def print_unique(items, value: str):
+    # cycles through an array and returns the unique values
+    unique_values = set()
+    for item in items:
+        v = item.get(value)
+        if v:
+            unique_values.add(v)
+    for v in unique_values:
+        return(v)
 
 def analyze_errors(data, site_array=None, error='Error ', group_by='site', top_n=None, save_path=None):
     """
