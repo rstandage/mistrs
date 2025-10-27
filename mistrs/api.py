@@ -1,4 +1,4 @@
-import requests, json, time, urllib.parse, re
+import requests, json, time, urllib.parse, re,sys
 from tqdm import tqdm
 
 def debug_get(url, headers):
