@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mistrs",
-    version="0.1.8",
-    released="23/10/2025",
+    version="0.2.0",
+    released="09/04/2026",
     author="Rory Standage",
     description="A collection of basic functions to communicate with Mist API",
     url="https://github.com/rstandage/mistrs",
@@ -24,7 +24,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9"
     ],
-    python_requires=">=3.6",  # Minimum Python version
+    python_requires=">=3.6",
     install_requires=[
         "pandas<=2.2.3",
         "prettytable<=3.14.0",
